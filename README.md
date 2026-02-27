@@ -25,7 +25,7 @@ Selection b/w candidates x and y follows as:
 2. If 1 is feasible $\rightarrow$ feasible one wins
 3. If both infesible $\rightarrow$ cmp voilation magnitude 
 
-$\epsilon \ \& \ \epsilon_f$ decreases over time, acting like continuation scheme
+$\epsilon$ & $\epsilon_f$ decreases over time, acting like continuation scheme
 - Early stage tolerates infeasibility
 - Late stage enforces strict feasibility
 
@@ -47,7 +47,9 @@ $x_{trial}​=x_i​+F(x_{best}​−x_i​)+F(x_{medium}​−x_{worst}​)$
 
 **Perturbation:**
 when crossover doesn't modify coordinate:
-$x_j = Couchy(x_j, 0.1)\ with\ prob\ 0.2$
+
+$x_j = Couchy(x_j, 0.1)\ with\ prob\ 0.2$ 
+
 $x_j = x_j\ \ otherwise$
 
 injecting rare large jumps to prevent coordinate stagnation
