@@ -15,7 +15,7 @@ total voilation $\implies$ $v(x) = \frac{1}{m}(\sum_i max(0, g_i(x)) + \sum_j|h_
 
 2 relaxation params:
 - $\epsilon_{f}$: objective relaxation *[NOT USED AT ALL]*
-- $\epsilon$: constraint relaxation *USED*
+- $\epsilon$: constraint relaxation *[USED]*
 > Selection uses a dynamic $\epsilon$ constrained dominance rule with an auxiliary objective relaxation threshold $\epsilon_{f}$.
 > If constraint violation ≤ $\epsilon \rightarrow$ treat as feasible
 > If constraint value ≤ $\epsilon_f \rightarrow$ treat as acceptable in objective cmp (even if infeasible)
