@@ -1,7 +1,9 @@
-Minimize: f(x), $x\in \mathbb{R}^n$ \\
+Minimize: f(x), $x\in \mathbb{R}^n$ 
+
 Subject to: $g_i(x) ≤ 0$ & $h_j(x) == 0$
 
-At iteration t, we maintain a population: $\{x_i^t\}_{i=1}^{N(t)}$ \\
+At iteration t, we maintain a population: $\{x_i^t\}_{i=1}^{N(t)}$ 
+
 Each candidtate has:
 - Objective value $f_i^t$ 
 - Constraint violation measure $v_i^t$
