@@ -1,7 +1,7 @@
-Minimize: f(x), $x\in \mathbb{R}^n$
+Minimize: f(x), $x\in \mathbb{R}^n$ \\
 Subject to: $g_i(x) ≤ 0$ & $h_j(x) == 0$
 
-At iteration t, we maintain a population: $\{x_i^t\}_{i=1}^{N(t)}$
+At iteration t, we maintain a population: $\{x_i^t\}_{i=1}^{N(t)}$ \\
 Each candidtate has:
 - Objective value $f_i^t$ 
 - Constraint violation measure $v_i^t$
@@ -19,7 +19,9 @@ total voilation $\implies$ $v(x) = \frac{1}{m}(\sum_i max(0, g_i(x)) + \sum_j|h_
 > If constraint value ≤ $\epsilon_f \rightarrow$ treat as acceptable in objective cmp (even if infeasible)
 
 Selection rules: 
-equality constraints treated as inequalities with some tolerance
+
+equality constraints treated as inequalities with some tolerance 
+
 Selection b/w candidates x and y follows as:
 1. If both are $\epsilon$ feasible $\rightarrow$ compare objective
 2. If 1 is feasible $\rightarrow$ feasible one wins
@@ -62,6 +64,7 @@ injecting rare large jumps to prevent coordinate stagnation
 
 ### Circular Elitist Update
 successful offspring inserted into elite front using rotating idx:
+
 $PFIndex=(PFIndex+1)\ mod\ N(t)$
 
 to ensure uniform elitist injection.
