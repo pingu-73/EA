@@ -37,8 +37,8 @@ std::uniform_real_distribution<double> uni_real(0.0,1.0);
 std::normal_distribution<double> norm_dist(0.0,1.0);
 std::cauchy_distribution<double> cachy_dist(0.0,1.0);
 
-const char* algName = "RDEx";
-double EB_hybrid_rate_init = 0.7;
+const char* algName = "RDEx_exp123";
+double EB_hybrid_rate_init = 0.5;
 
 int IntRandom(int target) {if(target == 0) return 0; return uni_int(generator_uni_i)%target;}
 double Random(double minimal, double maximal){return uni_real(generator_uni_r)*(maximal-minimal)+minimal;}
@@ -265,6 +265,10 @@ public:
     void EB_order(int prand, int Rand1, int Rand2);
     double* EB_hybrid_flag;
     void UpdateEB_hybrid_param(double* EB_hybrid_flag, double* FitArrFront, vector<double> FitTemp);
+
+    double** Archive;
+    int ArchiveFill;
+    int ArchiveIdx;
 };
 
 void Optimizer::Initialize(int _newNInds, int _newNVars, int _newfunc_num)
@@ -276,7 +280,7 @@ void Optimizer::Initialize(int _newNInds, int _newNVars, int _newfunc_num)
     PopulSize = _newNInds*2;
     Generation = 0;
     TheChosenOne = 0;
-    MemorySize = 5;
+    MemorySize = 3;
     MemoryIter = 0;
     SuccessFilled = 0;
     SuccessRate = 0.5;
@@ -304,6 +308,11 @@ void Optimizer::Initialize(int _newNInds, int _newNVars, int _newfunc_num)
     PopulFront = new double*[NIndsFront];
     for(int i=0;i!=NIndsFront;i++)
         PopulFront[i] = new double[NVars];
+    Archive = new double*[50];
+    for(int i=0;i!=50;i++)
+        Archive[i] = new double[NVars];
+    ArchiveFill = 0;
+    ArchiveIdx = 0;
     PopulFrontG = new double*[NIndsFront];
     for(int i=0;i!=NIndsFront;i++)
         PopulFrontG[i] = new double[3];
@@ -389,6 +398,9 @@ void Optimizer::Clean()
         delete PopulFrontG[i];
         delete PopulFrontH[i];
     }
+    for(int i=0;i!=50;i++)
+        delete Archive[i];
+    delete Archive;
     delete Popul;
     delete PopulG;
     delete PopulH;
@@ -653,7 +665,7 @@ void Optimizer::MainCycle()
     double EIndexParam = 0.8;
     while(NFEval < MaxFEval)
     {
-        double meanF = max(0.0,pow(SuccessRate,1.0/3.0));
+        double meanF = max(0.0,pow(SuccessRate,0.4));
         double sigmaF = 0.05;
 
         int epsilonindex = (NIndsFront*EIndexParam*
@@ -817,7 +829,10 @@ void Optimizer::MainCycle()
             do
                 F = NormRand(meanF2,sigmaF);
             while(F < 0.0 || F > 1.0);
-            double F2 = F;
+            double F2;
+            do
+                F2 = CachyRand(meanF2, 0.1);
+            while(F2 < 0.0 || F2 > 1.0);
 
             Cr = NormRand(MemoryCr[MemoryCurrentIndex],0.1);
             Cr = min(max(Cr,0.0),1.0);
@@ -865,7 +880,7 @@ void Optimizer::MainCycle()
                 if ((double)NFEval / (double)MaxFEval < 0.5)
                     Cr = max(Cr, 0.6);
 
-                bool perturbation = Random(0,1) < 0.2;
+                bool perturbation = false;
                                 
                 for(int j=0;j!=NVars;j++)
                 {
@@ -887,12 +902,20 @@ void Optimizer::MainCycle()
             }
             else{
                 EB_hybrid_flag[TheChosenOne] = 0;
-                bool perturbation = Random(0,1) < 0.2;
+                bool perturbation = false;
+                double* rand2_vec = Popul[Rand2];
+                if(ArchiveFill > 0) {
+                    double p_arch = double(ArchiveFill) / double(NIndsCurrent + ArchiveFill);
+                    if(Random(0,1) < p_arch) {
+                        int ai = IntRandom(ArchiveFill);
+                        rand2_vec = Archive[ai];
+                    }
+                }
                 for(int j=0;j!=NVars;j++)
                 {
                     if(Random(0,1) < Cr || WillCrossover == j)
                     {
-                        Trial[j] = PopulFront[TheChosenOne][j] + F*(Popul[prand][j] - PopulFront[TheChosenOne][j]) + F2*(PopulFront[Rand1][j] - Popul[Rand2][j]);
+                        Trial[j] = PopulFront[TheChosenOne][j] + F*(Popul[prand][j] - PopulFront[TheChosenOne][j]) + F2*(PopulFront[Rand1][j] - rand2_vec[j]);
                         if(Trial[j] < Left)
                             Trial[j] = (PopulFront[TheChosenOne][j] + Left)*0.5;
                         if(Trial[j] > Right)
@@ -980,6 +1003,12 @@ void Optimizer::MainCycle()
             }
             if(change)
             {
+                if(PenaltyArrFront[PFIndex] <= epsilon) {
+                    for(int j=0;j!=NVars;j++)
+                        Archive[ArchiveIdx][j] = PopulFront[PFIndex][j];
+                    ArchiveIdx = (ArchiveIdx + 1) % 50;
+                    if(ArchiveFill < 50) ArchiveFill++;
+                }
                 for(int j=0;j!=NVars;j++)
                 {
                     Popul[NIndsCurrent+SuccessFilled][j] = PopulTemp[IndIter][j];
