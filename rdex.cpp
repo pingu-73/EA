@@ -19,7 +19,7 @@ myclock::duration d1 = myclock::now() - beginning;
 #else
 
 #endif*/
-unsigned globalseed = unsigned(time(NULL));
+unsigned globalseed = 42; // FIXED SEED for deterministic baseline
 unsigned seed1 = globalseed+0;
 unsigned seed2 = globalseed+100;
 unsigned seed3 = globalseed+200;
@@ -865,7 +865,7 @@ void Optimizer::MainCycle()
                 if ((double)NFEval / (double)MaxFEval < 0.5)
                     Cr = max(Cr, 0.6);
 
-                bool perturbation = rand() / (double)RAND_MAX < 0.2;
+                bool perturbation = Random(0,1) < 0.2;
                                 
                 for(int j=0;j!=NVars;j++)
                 {
@@ -887,7 +887,7 @@ void Optimizer::MainCycle()
             }
             else{
                 EB_hybrid_flag[TheChosenOne] = 0;
-                bool perturbation = rand() / (double)RAND_MAX < 0.2;
+                bool perturbation = Random(0,1) < 0.2;
                 for(int j=0;j!=NVars;j++)
                 {
                     if(Random(0,1) < Cr || WillCrossover == j)
@@ -1085,7 +1085,7 @@ void Optimizer::MainCycle()
 int main(int argc, char** argv)
 {
     unsigned t0g=clock(),t1g;
-    int TotalNRuns = 25;
+    int TotalNRuns = 1; // BASELINE: 1 run per function with fixed seed
 
     if(TimeComplexity)
 	{
