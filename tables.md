@@ -195,3 +195,6 @@
 
 ## Speed Comparision Graphs:
 ![speed_grpahs](./speed_25runs_rdex_vs_improv.png)
+
+## Function Wise cmp:
+![cmp](./function_wise_cmp.png)
