@@ -20,7 +20,7 @@ myclock::duration d1 = myclock::now() - beginning;
 #else
 
 #endif*/
-unsigned globalseed = 42; // FIXED SEED for deterministic baseline
+unsigned globalseed = unsigned(time(NULL)); // wall-clock seed (override via argv[1])
 unsigned seed1 = globalseed+0;
 unsigned seed2 = globalseed+100;
 unsigned seed3 = globalseed+200;
@@ -1167,7 +1167,8 @@ int main(int argc, char** argv)
         ReseedGenerators(globalseed);
     }
     unsigned t0g=clock(),t1g;
-    int TotalNRuns = 1; // BASELINE: 1 run per function with fixed seed
+    int TotalNRuns = 25; // 25 runs per function (CEC paper protocol)
+    unsigned base_seed_for_runs = globalseed; // capture for per-run reseeding
 
     if(TimeComplexity)
 	{
@@ -1242,6 +1243,8 @@ int main(int argc, char** argv)
             for (int run = 0;run!=TotalNRuns;run++)
             {
                 cout<<"func\t"<<func_num<<"\trun\t"<<run<<endl;
+                // Per-run reseeding: deterministic, distinct per (run, func)
+                ReseedGenerators(base_seed_for_runs + run*1000u + func_num*7u);
                 ResultsArray[ResTsize2-1] = MaxFEval;
                 globalbestinit = false;
                 LastFEcount = 0;
